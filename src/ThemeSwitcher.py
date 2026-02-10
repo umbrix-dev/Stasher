@@ -1,0 +1,174 @@
+#!/bin/env python3
+
+"""
+ThemeSwitcher - v0.0.1
+https://www.github.com/umbrix-dev/themeSwitcher
+---------------------------------------------
+Switch between themes using a simple cli tool
+on hyprland.
+"""
+
+
+import os
+import json
+import shutil
+import argparse
+import platformdirs
+from pathlib import Path
+
+
+class IsAFileError(Exception):
+    pass
+
+
+class PathExistsError(Exception):
+    pass
+
+
+class ThemeSwitcher:
+    """The main class for ThemeSwitcher"""
+
+    def __init__(self) -> None:
+        """Define paths."""
+        self.user_data_dir = Path(platformdirs.user_data_dir())
+        self.root_dir = self.user_data_dir / "themeSwitcher"
+        self.themes_dir = self.root_dir / "themes"
+        self.backups_dir = self.root_dir / "backups"
+        self.auto_backups_dir = self.backups_dir / "auto"
+        self.paths_data = self.root_dir / "paths.json"
+
+    def _validate_path(self, path: str) -> None:
+        """Validate a path entry."""
+        path_object = Path(path)
+        if not os.path.exists(path_object):
+            raise FileNotFoundError(f"path: {path} was not found.")
+        elif os.path.isfile(path_object):
+            raise IsAFileError(f"path: {path} must be a directory, not a file.")
+
+    def _create_path(self, path: str) -> None:
+        """Create a new path entry."""
+        self._validate_path(path)
+
+        with open(self.paths_data, "r") as f:
+            try:
+                data = json.load(f)
+            except json.JSONDecodeError:
+                data = {}
+
+        with open(self.paths_data, "w") as f:
+            name = str.split(path, "/")[-1]
+            if data.get(name):
+                raise PathExistsError(f"path: {path} is already an entry.")
+
+            data[name] = path
+            json.dump(data, f, indent=4)
+
+    def _remove_path(self, path_or_key: str) -> None:
+        """Remove a path entry."""
+        if "/" in path_or_key:
+            path = path_or_key
+        else:
+            with open(self.paths_data, "r") as f:
+                try:
+                    path = json.load(f)[path_or_key]
+                except KeyError:
+                    raise KeyError(f"key: '{path_or_key}' was not found.")
+
+        self._validate_path(path)
+
+        with open(self.paths_data, "r") as f:
+            try:
+                data: dict[str, str] = json.load(f)
+                for path_key, path_entry in data.items():
+                    if path_entry == path:
+                        del data[path_key]
+
+                        with open(self.paths_data, "w") as f:
+                            json.dump(data, f, indent=4)
+
+                        break
+            except json.JSONDecodeError:
+                pass
+
+    def _list_paths(self) -> None:
+        with open(self.paths_data, "r") as f:
+            try:
+                data: dict[str, str] = json.load(f)
+                for path_key, path_entry in data.items():
+                    print(path_key, path_entry)
+            except json.JSONDecodeError:
+                pass
+
+    def _safemake(self, paths: dict[Path, bool]) -> None:
+        """Safely create files/directorys if they dont exist"""
+        for path, isFile in paths.items():
+            if isFile:
+                try:
+                    path.touch()
+                except FileExistsError:
+                    pass
+            else:
+                try:
+                    path.mkdir()
+                except FileExistsError:
+                    pass
+
+    def _setup(self) -> None:
+        """Create required directorys and files."""
+        self._safemake(
+            {
+                self.user_data_dir: False,
+                self.root_dir: False,
+                self.themes_dir: False,
+                self.backups_dir: False,
+                self.auto_backups_dir: False,
+                self.paths_data: True,
+            }
+        )
+
+    def _setup_cli(self) -> None:
+        """Create parsers and arguments."""
+        self.parser = argparse.ArgumentParser(
+            description="A unique config manager for hyprland."
+        )
+        subparsers = self.parser.add_subparsers(dest="command", required=True)
+
+        self.path_parser = subparsers.add_parser("path", help="Manage paths.")
+        self.path_parser.add_argument(
+            "-a", "--add", metavar="path", help="Add a new path."
+        )
+        self.path_parser.add_argument(
+            "-r", "--remove", metavar="path", help="Remove a path."
+        )
+        self.path_parser.add_argument(
+            "-l", "--list", action="store_true", help="List all added paths."
+        )
+
+    def _handle_cli(self) -> None:
+        """Handle commands and arguments."""
+        args = self.parser.parse_args()
+        if args.command == "path":
+            if args.add:
+                self._create_path(args.add)
+            elif args.remove:
+                self._remove_path(args.remove)
+            elif args.list:
+                self._list_paths()
+            else:
+                self.path_parser.print_usage()
+
+    def run(self) -> None:
+        """Setup and execute ThemeSwitcher."""
+        self._setup()
+        self._setup_cli()
+        self._handle_cli()
+
+
+def main() -> None:
+    """The main entry point for ThemeSwitcher"""
+    themeSwitcher = ThemeSwitcher()
+    themeSwitcher.run()
+
+
+if __name__ == "__main__":
+    main()
