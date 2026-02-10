@@ -25,6 +25,10 @@ class PathExistsError(Exception):
     pass
 
 
+class DirectoryNameError(Exception):
+    pass
+
+
 class ThemeSwitcher:
     """The main class for ThemeSwitcher"""
 
@@ -41,9 +45,25 @@ class ThemeSwitcher:
         """Validate a path entry."""
         path_object = Path(path)
         if not os.path.exists(path_object):
-            raise FileNotFoundError(f"path: {path} was not found.")
+            raise FileNotFoundError(f"path: '{path}' was not found.")
         elif os.path.isfile(path_object):
-            raise IsAFileError(f"path: {path} must be a directory, not a file.")
+            raise IsAFileError(f"path: '{path}' must be a directory, not a file.")
+
+    def _validate_dir_name(self, name: str) -> None:
+        """Validate a name to be used for a directory."""
+        name = name.strip()
+        if "/" in name:
+            raise DirectoryNameError(
+                f"name: '{name}' consists of forbidden character: '/'."
+            )
+        elif len(name) == 0:
+            raise DirectoryNameError("name cannot be an empty.")
+
+        for char in name:
+            if char != ".":
+                return
+
+        raise DirectoryNameError("name cannot only consist of dots.")
 
     def _create_path(self, path: str) -> None:
         """Create a new path entry."""
@@ -58,7 +78,7 @@ class ThemeSwitcher:
         with open(self.paths_data, "w") as f:
             name = str.split(path, "/")[-1]
             if data.get(name):
-                raise PathExistsError(f"path: {path} is already an entry.")
+                raise PathExistsError(f"path: '{path}' is already an entry.")
 
             data[name] = path
             json.dump(data, f, indent=4)
@@ -99,6 +119,9 @@ class ThemeSwitcher:
             except json.JSONDecodeError:
                 pass
 
+    def _create_theme(self, name: str) -> None:
+        self._validate_dir_name(name)
+
     def _safemake(self, paths: dict[Path, bool]) -> None:
         """Safely create files/directorys if they dont exist"""
         for path, isFile in paths.items():
@@ -126,23 +149,32 @@ class ThemeSwitcher:
             }
         )
 
+    def _create_path_parser(self) -> argparse.ArgumentParser:
+        path_parser = self.subparsers.add_parser("path", help="Manage paths.")
+        path_parser.add_argument("-a", "--add", metavar="path", help="Add a new path.")
+        path_parser.add_argument(
+            "-r", "--remove", metavar="path", help="Remove a path."
+        )
+        path_parser.add_argument(
+            "-l", "--list", action="store_true", help="List all added paths."
+        )
+        return path_parser
+
+    def _create_theme_parser(self) -> argparse.ArgumentParser:
+        theme_parser = self.subparsers.add_parser("theme", help="Manage themes.")
+        theme_parser.add_argument(
+            "-c", "--create", metavar="name", help="Create a new theme."
+        )
+        return theme_parser
+
     def _setup_cli(self) -> None:
         """Create parsers and arguments."""
         self.parser = argparse.ArgumentParser(
             description="A unique config manager for hyprland."
         )
-        subparsers = self.parser.add_subparsers(dest="command", required=True)
-
-        self.path_parser = subparsers.add_parser("path", help="Manage paths.")
-        self.path_parser.add_argument(
-            "-a", "--add", metavar="path", help="Add a new path."
-        )
-        self.path_parser.add_argument(
-            "-r", "--remove", metavar="path", help="Remove a path."
-        )
-        self.path_parser.add_argument(
-            "-l", "--list", action="store_true", help="List all added paths."
-        )
+        self.subparsers = self.parser.add_subparsers(dest="command", required=True)
+        self.path_parser = self._create_path_parser()
+        self.theme_parser = self._create_theme_parser()
 
     def _handle_cli(self) -> None:
         """Handle commands and arguments."""
@@ -156,6 +188,11 @@ class ThemeSwitcher:
                 self._list_paths()
             else:
                 self.path_parser.print_usage()
+        elif args.command == "theme":
+            if args.create:
+                self._create_theme(args.create)
+            else:
+                self.theme_parser.print_usage()
 
     def run(self) -> None:
         """Setup and execute ThemeSwitcher."""
