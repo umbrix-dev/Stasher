@@ -255,9 +255,7 @@ class ThemeSwitcher:
         path_parser = self.subparsers.add_parser("path", help="Manage paths.")
         path_parser.add_argument("-a", "--add", metavar="path", help="Add a new path.")
         path_parser.add_argument("-r", "--remove", metavar="path", help="Remove a path")
-        path_parser.add_argument(
-            "--wipe", action="store_true", help="Wipe all paths."
-        )
+        path_parser.add_argument("--wipe", action="store_true", help="Wipe all paths.")
         path_parser.add_argument(
             "-l", "--list", action="store_true", help="List all added paths."
         )
