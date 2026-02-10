@@ -83,15 +83,19 @@ class ThemeSwitcher:
 
         raise DirectoryNameError("name cannot only consist of dots.")
 
+    def _load_paths_data(self) -> dict[str, str] | dict:
+        """Load paths data or default to empty dictionary."""
+        with open(self.paths_data, "r") as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return {}
+
     def _create_path(self, path: str) -> None:
         """Create a new path entry."""
         self._validate_path(path)
 
-        with open(self.paths_data, "r") as f:
-            try:
-                data = json.load(f)
-            except json.JSONDecodeError:
-                data = {}
+        data = self._load_paths_data()
 
         with open(self.paths_data, "w") as f:
             name = str.split(path, "/")[-1]
@@ -158,9 +162,7 @@ class ThemeSwitcher:
         """Create a new theme with the given name."""
         self._validate_dir_name(name)
 
-        with open(self.paths_data, "r") as f:
-            data = json.load(f)
-
+        data = self._load_paths_data()
         if len(data) < 1:
             raise NoEntrysError(
                 "Make sure to add a path entry before creating a theme."
