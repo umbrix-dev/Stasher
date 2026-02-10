@@ -18,14 +18,32 @@ from pathlib import Path
 
 
 class IsAFileError(Exception):
+    """Raised when a path is a file."""
+
     pass
 
 
 class PathExistsError(Exception):
+    """Raised when a path entry already exists."""
+
     pass
 
 
 class DirectoryNameError(Exception):
+    """Raised when a directory uses forbidden naming."""
+
+    pass
+
+
+class DirectoryExistsError(Exception):
+    """Raised when a directory already exists."""
+
+    pass
+
+
+class NoEntrysError(Exception):
+    """Raised when no path entries exist."""
+
     pass
 
 
@@ -85,6 +103,17 @@ class ThemeSwitcher:
 
     def _remove_path(self, path_or_key: str) -> None:
         """Remove a path entry."""
+        if path_or_key.strip() == "*":
+            remove_all = (
+                input("Are you sure you want to remove all path entrys?: [y/N]: ")
+                .strip()
+                .lower()
+            )
+            if "y" in remove_all:
+                with open(self.paths_data, "w"):
+                    pass
+                return
+
         if "/" in path_or_key:
             path = path_or_key
         else:
@@ -111,6 +140,7 @@ class ThemeSwitcher:
                 pass
 
     def _list_paths(self) -> None:
+        """List all path entrys."""
         with open(self.paths_data, "r") as f:
             try:
                 data: dict[str, str] = json.load(f)
@@ -119,8 +149,28 @@ class ThemeSwitcher:
             except json.JSONDecodeError:
                 pass
 
+    def _clean_paths(self) -> None:
+        """Clean and remove all paths."""
+        with open(self.paths_data, "w"):
+            pass
+
     def _create_theme(self, name: str) -> None:
+        """Create a new theme with the given name."""
         self._validate_dir_name(name)
+
+        with open(self.paths_data, "r") as f:
+            data = json.load(f)
+
+        if len(data) < 1:
+            raise NoEntrysError(
+                "Make sure to add a path entry before creating a theme."
+            )
+
+        theme_path = self.themes_dir / name
+        if os.path.exists(theme_path):
+            raise DirectoryExistsError(f"theme with name: {name} already exists.")
+        else:
+            theme_path.mkdir()
 
     def _safemake(self, paths: dict[Path, bool]) -> None:
         """Safely create files/directorys if they dont exist"""
@@ -150,10 +200,12 @@ class ThemeSwitcher:
         )
 
     def _create_path_parser(self) -> argparse.ArgumentParser:
+        """Create and return the path parser."""
         path_parser = self.subparsers.add_parser("path", help="Manage paths.")
         path_parser.add_argument("-a", "--add", metavar="path", help="Add a new path.")
+        path_parser.add_argument("-r", "--remove", metavar="path", help="Remove a path")
         path_parser.add_argument(
-            "-r", "--remove", metavar="path", help="Remove a path."
+            "--clean", action="store_true", help="Clean and remove all paths."
         )
         path_parser.add_argument(
             "-l", "--list", action="store_true", help="List all added paths."
@@ -161,6 +213,7 @@ class ThemeSwitcher:
         return path_parser
 
     def _create_theme_parser(self) -> argparse.ArgumentParser:
+        """Create and return the theme parser."""
         theme_parser = self.subparsers.add_parser("theme", help="Manage themes.")
         theme_parser.add_argument(
             "-c", "--create", metavar="name", help="Create a new theme."
@@ -186,6 +239,8 @@ class ThemeSwitcher:
                 self._remove_path(args.remove)
             elif args.list:
                 self._list_paths()
+            elif args.clean:
+                self._clean_paths()
             else:
                 self.path_parser.print_usage()
         elif args.command == "theme":
