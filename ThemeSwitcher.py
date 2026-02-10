@@ -165,6 +165,14 @@ class ThemeSwitcher:
         """Clean and remove all paths."""
         with open(self.paths_data, "w"):
             pass
+        
+    def _get_theme(self, name: str) -> Path:
+        """Check if a theme exists and return it"""
+        theme_path = self.themes_dir / name
+        if not os.path.exists(theme_path):
+            raise ThemeNotFoundError(f"theme with name: '{name}' was not found.")
+        else:
+            return theme_path
 
     def _create_theme(self, name: str) -> None:
         """Create a new theme with the given name."""
@@ -179,7 +187,7 @@ class ThemeSwitcher:
         theme_path = self.themes_dir / name
         if os.path.exists(theme_path):
             raise ThemeExistsError(f"theme with name: '{name}' already exists.")
-        else:
+        else:        
             for path_key, path_entry in data.items():
                 dest_path = theme_path / path_key
                 try:
@@ -193,9 +201,7 @@ class ThemeSwitcher:
 
     def _delete_theme(self, name: str) -> None:
         """Delete a theme with the given name."""
-        theme_path = self.themes_dir / name
-        if not os.path.exists(theme_path):
-            raise ThemeNotFoundError(f"theme with name: '{name}' was not found.")
+        theme_path = self._get_theme(name)
 
         try:
             shutil.rmtree(theme_path)
@@ -222,6 +228,10 @@ class ThemeSwitcher:
                         file=sys.stderr,
                     )
                     sys.exit(1)
+                    
+    def _apply_theme(self, name: str) -> None:
+        """Apply a theme with the given name."""
+        theme_path = self._get_theme(name)
 
     def _safemake(self, paths: dict[Path, bool]) -> None:
         """Safely create files/directorys if they dont exist"""
@@ -275,6 +285,9 @@ class ThemeSwitcher:
         )
         theme_parser.add_argument(
             "-l", "--list", action="store_true", help="List all created themes."
+        )
+        theme_parser.add_argument(
+            "-a", "--apply", metavar="name", help="Apply a theme."
         )
         return theme_parser
 
