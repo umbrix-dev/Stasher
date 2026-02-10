@@ -200,11 +200,14 @@ class ThemeSwitcher:
         try:
             shutil.rmtree(theme_path)
         except Exception as e:
-            print(
-                f"Could not remove directory '{theme_path}': {e}",
-                file=sys.stderr
-            )
+            print(f"Could not remove directory '{theme_path}': {e}", file=sys.stderr)
             sys.exit(1)
+
+    def _list_themes(self) -> None:
+        """List all created themes."""
+        for theme in os.listdir(self.themes_dir):
+            if os.path.isdir(os.path.join(self.themes_dir, theme)):
+                print(theme)
 
     def _safemake(self, paths: dict[Path, bool]) -> None:
         """Safely create files/directorys if they dont exist"""
@@ -255,6 +258,9 @@ class ThemeSwitcher:
         theme_parser.add_argument(
             "-d", "--delete", metavar="name", help="Delete a theme."
         )
+        theme_parser.add_argument(
+            "-l", "--list", action="store_true", help="List all created themes."
+        )
         return theme_parser
 
     def _setup_cli(self) -> None:
@@ -285,6 +291,8 @@ class ThemeSwitcher:
                 self._create_theme(args.create)
             elif args.delete:
                 self._delete_theme(args.delete)
+            elif args.list:
+                self._list_themes()
             else:
                 self.theme_parser.print_usage()
 
