@@ -3,7 +3,7 @@
 """
 ThemeSwitcher - v0.0.1
 https://www.github.com/umbrix-dev/themeSwitcher
----------------------------------------------
+-----------------------------------------------
 Switch between themes using a simple cli tool
 on hyprland.
 """
@@ -19,41 +19,7 @@ from pathlib import Path
 
 import platformdirs
 
-
-class IsAFileError(Exception):
-    """Raised when a path is a file."""
-
-    pass
-
-
-class PathExistsError(Exception):
-    """Raised when a path entry already exists."""
-
-    pass
-
-
-class DirectoryNameError(Exception):
-    """Raised when a directory uses forbidden naming."""
-
-    pass
-
-
-class ThemeExistsError(Exception):
-    """Raised when a theme already exists."""
-
-    pass
-
-
-class ThemeNotFoundError(Exception):
-    """Raised when a theme was not found."""
-
-    pass
-
-
-class NoEntrysError(Exception):
-    """Raised when no path entries exist."""
-
-    pass
+from Errors import *
 
 
 class ThemeSwitcher:
