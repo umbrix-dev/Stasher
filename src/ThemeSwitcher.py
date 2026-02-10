@@ -10,11 +10,13 @@ on hyprland.
 
 
 import os
+import sys
 import json
 import shutil
 import argparse
-import platformdirs
 from pathlib import Path
+
+import platformdirs
 
 
 class IsAFileError(Exception):
@@ -35,7 +37,7 @@ class DirectoryNameError(Exception):
     pass
 
 
-class DirectoryExistsError(Exception):
+class ThemeExistsError(Exception):
     """Raised when a directory already exists."""
 
     pass
@@ -170,9 +172,18 @@ class ThemeSwitcher:
 
         theme_path = self.themes_dir / name
         if os.path.exists(theme_path):
-            raise DirectoryExistsError(f"theme with name: {name} already exists.")
+            raise ThemeExistsError(f"theme with name: '{name}' already exists.")
         else:
-            theme_path.mkdir()
+            for path_key, path_entry in data.items():
+                dest_path = theme_path / path_key
+                try:
+                    shutil.copytree(path_entry, dest_path)
+                except Exception as e:
+                    print(
+                        f"Could not copy directory '{path_entry}' to '{path_key}': {e}",
+                        file=sys.stderr,
+                    )
+                    sys.exit(1)
 
     def _safemake(self, paths: dict[Path, bool]) -> None:
         """Safely create files/directorys if they dont exist"""
@@ -219,6 +230,9 @@ class ThemeSwitcher:
         theme_parser = self.subparsers.add_parser("theme", help="Manage themes.")
         theme_parser.add_argument(
             "-c", "--create", metavar="name", help="Create a new theme."
+        ),
+        theme_parser.add_argument(
+            "-d", "--delete", metavar="name", help="Delete a theme."
         )
         return theme_parser
 
