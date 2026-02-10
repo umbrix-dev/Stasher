@@ -165,7 +165,7 @@ class ThemeSwitcher:
         """Clean and remove all paths."""
         with open(self.paths_data, "w"):
             pass
-        
+
     def _get_theme(self, name: str) -> Path:
         """Check if a theme exists and return it"""
         theme_path = self.themes_dir / name
@@ -187,7 +187,7 @@ class ThemeSwitcher:
         theme_path = self.themes_dir / name
         if os.path.exists(theme_path):
             raise ThemeExistsError(f"theme with name: '{name}' already exists.")
-        else:        
+        else:
             for path_key, path_entry in data.items():
                 dest_path = theme_path / path_key
                 try:
@@ -228,10 +228,16 @@ class ThemeSwitcher:
                         file=sys.stderr,
                     )
                     sys.exit(1)
-                    
+
     def _apply_theme(self, name: str) -> None:
         """Apply a theme with the given name."""
         theme_path = self._get_theme(name)
+        data = self._load_paths_data()
+        for config_dir in os.listdir(theme_path):
+            if config_dir in data:
+                shutil.copytree(
+                    theme_path, Path(data[config_dir]).parent, dirs_exist_ok=True
+                )
 
     def _safemake(self, paths: dict[Path, bool]) -> None:
         """Safely create files/directorys if they dont exist"""
@@ -289,6 +295,9 @@ class ThemeSwitcher:
         theme_parser.add_argument(
             "-a", "--apply", metavar="name", help="Apply a theme."
         )
+        theme_parser.add_argument(
+            "-r", "--reload", help="Run reload commands on known configs."
+        )
         return theme_parser
 
     def _setup_cli(self) -> None:
@@ -323,6 +332,8 @@ class ThemeSwitcher:
                 self._wipe_themes()
             elif args.list:
                 self._list_themes()
+            elif args.apply:
+                self._apply_theme(args.apply)
             else:
                 self.theme_parser.print_usage()
 
