@@ -14,6 +14,7 @@ import sys
 import json
 import shutil
 import argparse
+import subprocess
 from pathlib import Path
 
 import platformdirs
@@ -239,6 +240,11 @@ class ThemeSwitcher:
                     theme_path, Path(data[config_dir]).parent, dirs_exist_ok=True
                 )
 
+    def _reload_themes(self) -> None:
+        commands = [["hyprctl", "reload"], ["killall", "-SIGUSR2", "waybar"]]
+        for cmd in commands:
+            subprocess.run(cmd, check=False)
+
     def _safemake(self, paths: dict[Path, bool]) -> None:
         """Safely create files/directorys if they dont exist"""
         for path, isFile in paths.items():
@@ -296,7 +302,10 @@ class ThemeSwitcher:
             "-a", "--apply", metavar="name", help="Apply a theme."
         )
         theme_parser.add_argument(
-            "-r", "--reload", help="Run reload commands on known configs."
+            "-r",
+            "--reload",
+            action="store_true",
+            help="Run reload commands on known configs.",
         )
         return theme_parser
 
@@ -334,6 +343,8 @@ class ThemeSwitcher:
                 self._list_themes()
             elif args.apply:
                 self._apply_theme(args.apply)
+            elif args.reload:
+                self._reload_themes()
             else:
                 self.theme_parser.print_usage()
 
