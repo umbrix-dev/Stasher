@@ -1,14 +1,12 @@
-#!/bin/env python3
-
 """
 ThemeSwitcher - v0.0.1
 https://www.github.com/umbrix-dev/themeSwitcher
 -----------------------------------------------
 Switch between themes using a simple cli tool
-on hyprland.
+on Hyprland.
 """
 
-from core.themeSwitcher import ThemeSwitcher
+from core.theme_switcher import ThemeSwitcher
 
 
 def main() -> None:
