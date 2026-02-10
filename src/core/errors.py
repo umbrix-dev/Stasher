@@ -1,5 +1,6 @@
 """All custom errors for ThemeSwitcher."""
 
+
 class IsAFileError(Exception):
     """Raised when a path is a file."""
 
