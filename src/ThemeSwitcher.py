@@ -38,7 +38,13 @@ class DirectoryNameError(Exception):
 
 
 class ThemeExistsError(Exception):
-    """Raised when a directory already exists."""
+    """Raised when a theme already exists."""
+
+    pass
+
+
+class ThemeNotFoundError(Exception):
+    """Raised when a theme was not found."""
 
     pass
 
@@ -185,6 +191,21 @@ class ThemeSwitcher:
                     )
                     sys.exit(1)
 
+    def _delete_theme(self, name: str) -> None:
+        """Delete a theme with the given name."""
+        theme_path = self.themes_dir / name
+        if not os.path.exists(theme_path):
+            raise ThemeNotFoundError(f"theme with name: '{name}' was not found.")
+
+        try:
+            shutil.rmtree(theme_path)
+        except Exception as e:
+            print(
+                f"Could not remove directory '{theme_path}': {e}",
+                file=sys.stderr
+            )
+            sys.exit(1)
+
     def _safemake(self, paths: dict[Path, bool]) -> None:
         """Safely create files/directorys if they dont exist"""
         for path, isFile in paths.items():
@@ -262,6 +283,8 @@ class ThemeSwitcher:
         elif args.command == "theme":
             if args.create:
                 self._create_theme(args.create)
+            elif args.delete:
+                self._delete_theme(args.delete)
             else:
                 self.theme_parser.print_usage()
 
