@@ -161,7 +161,7 @@ class ThemeSwitcher:
             except json.JSONDecodeError:
                 pass
 
-    def _clean_paths(self) -> None:
+    def _wipe_paths(self) -> None:
         """Clean and remove all paths."""
         with open(self.paths_data, "w"):
             pass
@@ -209,6 +209,20 @@ class ThemeSwitcher:
             if os.path.isdir(os.path.join(self.themes_dir, theme)):
                 print(theme)
 
+    def _wipe_themes(self) -> None:
+        """Reset and remove all themes."""
+        for theme in os.listdir(self.themes_dir):
+            full_path = os.path.join(self.themes_dir / theme)
+            if os.path.isdir(full_path):
+                try:
+                    shutil.rmtree(full_path)
+                except Exception as e:
+                    print(
+                        f"Could not remove directory '{full_path}': {e}",
+                        file=sys.stderr,
+                    )
+                    sys.exit(1)
+
     def _safemake(self, paths: dict[Path, bool]) -> None:
         """Safely create files/directorys if they dont exist"""
         for path, isFile in paths.items():
@@ -242,7 +256,7 @@ class ThemeSwitcher:
         path_parser.add_argument("-a", "--add", metavar="path", help="Add a new path.")
         path_parser.add_argument("-r", "--remove", metavar="path", help="Remove a path")
         path_parser.add_argument(
-            "--clean", action="store_true", help="Clean and remove all paths."
+            "--wipe", action="store_true", help="Wipe all paths."
         )
         path_parser.add_argument(
             "-l", "--list", action="store_true", help="List all added paths."
@@ -257,6 +271,9 @@ class ThemeSwitcher:
         ),
         theme_parser.add_argument(
             "-d", "--delete", metavar="name", help="Delete a theme."
+        )
+        theme_parser.add_argument(
+            "--wipe", action="store_true", help="Wipe all themes."
         )
         theme_parser.add_argument(
             "-l", "--list", action="store_true", help="List all created themes."
@@ -280,10 +297,10 @@ class ThemeSwitcher:
                 self._create_path(args.add)
             elif args.remove:
                 self._remove_path(args.remove)
+            elif args.wipe:
+                self._wipe_paths()
             elif args.list:
                 self._list_paths()
-            elif args.clean:
-                self._clean_paths()
             else:
                 self.path_parser.print_usage()
         elif args.command == "theme":
@@ -291,6 +308,8 @@ class ThemeSwitcher:
                 self._create_theme(args.create)
             elif args.delete:
                 self._delete_theme(args.delete)
+            elif args.wipe:
+                self._wipe_themes()
             elif args.list:
                 self._list_themes()
             else:
