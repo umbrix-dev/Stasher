@@ -4,8 +4,11 @@ import argparse
 class Parser:
     """The main argument parsing handler for Stasher."""
 
-    def __init__(self, parser: argparse.ArgumentParser) -> None:
-        self.subparsers = parser.add_subparsers(dest="command")
+    def __init__(self) -> None:
+        self.parser = argparse.ArgumentParser(
+            description="A simple snapshot manager for Linux."
+        )
+        self.subparsers = self.parser.add_subparsers(dest="command")
         self.parsers = self._create_parsers()
 
     def _create_parsers(self) -> dict[str, argparse.ArgumentParser]:
@@ -35,6 +38,10 @@ class Parser:
     def _create_parser(
         self, name: str, help: str, *arguments: tuple[str]
     ) -> argparse.ArgumentParser:
-        parser = self.subparsers.add_parser(name, help=help)
+        parser = self.subparsers.add_parser(
+            name=name,
+            help=help,
+        )
         for argument in arguments:
             parser.add_argument(argument)
+        return parser
