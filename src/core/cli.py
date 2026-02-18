@@ -30,7 +30,7 @@ class Cli:
                 "list": [self.pathService.list_paths, ()],
                 "_": [self.pathParser.print_usage, ()],
             },
-            "theme": {
+            "stash": {
                 "create": [self.stashService.create_stash, ("create",)],
                 "delete": [self.stashService.delete_stash, ("delete",)],
                 "wipe": [self.stashService.wipe_stashes, ()],
