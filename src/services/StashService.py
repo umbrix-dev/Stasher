@@ -8,20 +8,19 @@ import platformdirs
 
 from core.errors import (
     DirectoryNameError,
-    ThemeNotFoundError,
+    StashNotFoundError,
     NoEntrysError,
-    ThemeExistsError,
+    StashExistsError,
 )
 
 
-class ThemeService:
-    """The main class for the ThemeService."""
+class StashService:
+    """The main class for the StashService."""
 
     def __init__(self, pathService):
         self.user_data_dir = Path(platformdirs.user_data_dir())
-        self.root_dir = self.user_data_dir / "themeSwitcher"
-        self.themes_dir = self.root_dir / "themes"
-
+        self.root_dir = self.user_data_dir / "stasher"
+        self.stashes_dir = self.root_dir / "stashes"
         self.pathService = pathService
 
     def _validate_dir_name(self, name: str) -> None:
@@ -40,30 +39,30 @@ class ThemeService:
 
         raise DirectoryNameError("name cannot only consist of dots.")
 
-    def _get_theme(self, name: str) -> Path:
-        """Check if a theme exists and return it"""
-        theme_path = self.themes_dir / name
-        if not os.path.exists(theme_path):
-            raise ThemeNotFoundError(f"theme with name: '{name}' was not found.")
+    def _get_stash(self, name: str) -> Path:
+        """Check if a stash exists and return it"""
+        stash_path = self.stashes_dir / name
+        if not os.path.exists(stash_path):
+            raise StashNotFoundError(f"stash with name: '{name}' was not found.")
         else:
-            return theme_path
+            return stash_path
 
-    def create_theme(self, name: str) -> None:
-        """Create a new theme with the given name."""
+    def create_stash(self, name: str) -> None:
+        """Create a new stash with the given name."""
         self._validate_dir_name(name)
 
         data = self.pathService.load_paths_data()
         if len(data) < 1:
             raise NoEntrysError(
-                "Make sure to add a path entry before creating a theme."
+                "Make sure to add a path entry before creating a stash."
             )
 
-        theme_path = self.themes_dir / name
-        if os.path.exists(theme_path):
-            raise ThemeExistsError(f"theme with name: '{name}' already exists.")
+        stash_path = self.stashes_dir / name
+        if os.path.exists(stash_path):
+            raise StashExistsError(f"stash with name: '{name}' already exists.")
         else:
             for path_key, path_entry in data.items():
-                dest_path = theme_path / path_key
+                dest_path = stash_path / path_key
                 try:
                     shutil.copytree(path_entry, dest_path)
                 except Exception as e:
@@ -73,26 +72,26 @@ class ThemeService:
                     )
                     sys.exit(1)
 
-    def delete_theme(self, name: str) -> None:
-        """Delete a theme with the given name."""
-        theme_path = self._get_theme(name)
+    def delete_stash(self, name: str) -> None:
+        """Delete a stash with the given name."""
+        stash_path = self._get_stash(name)
 
         try:
-            shutil.rmtree(theme_path)
+            shutil.rmtree(stash_path)
         except Exception as e:
-            print(f"Could not remove directory '{theme_path}': {e}", file=sys.stderr)
+            print(f"Could not remove directory '{stash_path}': {e}", file=sys.stderr)
             sys.exit(1)
 
-    def list_themes(self) -> None:
-        """List all created themes."""
-        for theme in os.listdir(self.themes_dir):
-            if os.path.isdir(os.path.join(self.themes_dir, theme)):
-                print(theme)
+    def list_stashes(self) -> None:
+        """List all created stashes."""
+        for stash in os.listdir(self.stashes_dir):
+            if os.path.isdir(os.path.join(self.stashes_dir, stash)):
+                print(stash)
 
-    def wipe_themes(self) -> None:
-        """Reset and remove all themes."""
-        for theme in os.listdir(self.themes_dir):
-            full_path = os.path.join(self.themes_dir / theme)
+    def wipe_stashes(self) -> None:
+        """Reset and remove all stashes."""
+        for stash in os.listdir(self.stashes_dir):
+            full_path = os.path.join(self.stashes_dir / stash)
             if os.path.isdir(full_path):
                 try:
                     shutil.rmtree(full_path)
@@ -103,17 +102,17 @@ class ThemeService:
                     )
                     sys.exit(1)
 
-    def apply_theme(self, name: str) -> None:
-        """Apply a theme with the given name."""
-        theme_path = self._get_theme(name)
+    def apply_stash(self, name: str) -> None:
+        """Apply a stash with the given name."""
+        stash_path = self._get_stash(name)
         data = self.pathService.load_paths_data()
-        for config_dir in os.listdir(theme_path):
+        for config_dir in os.listdir(stash_path):
             if config_dir in data:
                 shutil.copytree(
-                    theme_path, Path(data[config_dir]).parent, dirs_exist_ok=True
+                    stash_path, Path(data[config_dir]).parent, dirs_exist_ok=True
                 )
 
-    def reload_themes(self) -> None:
+    def reload_stashes(self) -> None:
         commands = [["hyprctl", "reload"], ["killall", "-SIGUSR2", "waybar"]]
         for cmd in commands:
             try:

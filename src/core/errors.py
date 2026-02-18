@@ -1,4 +1,4 @@
-"""All custom errors for ThemeSwitcher."""
+"""All custom errors for Stasher."""
 
 
 class IsAFileError(Exception):
@@ -19,14 +19,14 @@ class DirectoryNameError(Exception):
     pass
 
 
-class ThemeExistsError(Exception):
-    """Raised when a theme already exists."""
+class StashExistsError(Exception):
+    """Raised when a stash already exists."""
 
     pass
 
 
-class ThemeNotFoundError(Exception):
-    """Raised when a theme was not found."""
+class StashNotFoundError(Exception):
+    """Raised when a stash was not found."""
 
     pass
 

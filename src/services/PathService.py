@@ -13,7 +13,7 @@ class PathService:
     def __init__(self) -> None:
         """Define paths."""
         self.user_data_dir = Path(platformdirs.user_data_dir())
-        self.root_dir = self.user_data_dir / "themeSwitcher"
+        self.root_dir = self.user_data_dir / "stasher"
         self.paths_data = self.root_dir / "paths.json"
 
     def _validate_path(self, path: str) -> None:

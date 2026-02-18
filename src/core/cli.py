@@ -2,20 +2,20 @@ import argparse
 from typing import Any, Callable
 
 from parsers.path_parser import PathParser
-from parsers.theme_parser import ThemeParser
+from parsers.stash_parser import StashParser
 
 
 class Cli:
-    def __init__(self, pathService, themeService) -> None:
+    def __init__(self, pathService, stashService) -> None:
         """Create parsers and arguments."""
         self.parser = argparse.ArgumentParser(
-            description="A unique config manager for hyprland."
+            description="A simple snapshot manager for Linux."
         )
         self.subparsers = self.parser.add_subparsers(dest="command", required=True)
         self.pathParser = PathParser(self.subparsers)
-        self.themeParser = ThemeParser(self.subparsers)
+        self.stashParser = StashParser(self.subparsers)
         self.pathService = pathService
-        self.themeService = themeService
+        self.stashService = stashService
         self.command_map = self._setup_command_map()
 
     def _setup_command_map(
@@ -30,13 +30,13 @@ class Cli:
                 "_": [self.pathParser.print_usage, ()],
             },
             "theme": {
-                "create": [self.themeService.create_theme, ("create",)],
-                "delete": [self.themeService.delete_theme, ("delete",)],
-                "wipe": [self.themeService.wipe_themes, ()],
-                "list": [self.themeService.list_themes, ()],
-                "apply": [self.themeService.apply_theme, ("apply",)],
-                "reload": [self.themeService.reload_themes, ()],
-                "_": [self.themeParser.print_usage, ()],
+                "create": [self.stashService.create_theme, ("create",)],
+                "delete": [self.stashService.delete_theme, ("delete",)],
+                "wipe": [self.stashService.wipe_themes, ()],
+                "list": [self.stashService.list_themes, ()],
+                "apply": [self.stashService.apply_theme, ("apply",)],
+                "reload": [self.stashService.reload_themes, ()],
+                "_": [self.stashParser.print_usage, ()],
             },
         }
 
