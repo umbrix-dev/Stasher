@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Installer script for themeswitcher
+Installer script for stasher
 Installs requirements and sets up global PATH access on Linux
 """
 
@@ -12,13 +12,13 @@ import platform
 from pathlib import Path
 
 
-class ThemeSwitcherInstaller:
+class StasherInstaller:
     def __init__(self) -> None:
         self.root_dir = Path(__file__).parent.resolve()
         self.bin_dir = self.root_dir / "bin"
         self.venv_dir = self.root_dir / ".venv"
         self.requirements_file = self.root_dir / "requirements.txt"
-        self.shell_script = self.bin_dir / "themeswitcher"
+        self.shell_script = self.bin_dir / "stasher"
 
     def check_platform(self) -> bool:
         """Check if running on Linux"""
@@ -98,7 +98,7 @@ class ThemeSwitcherInstaller:
         rc_file = rc_files.get(shell_name, Path.home() / ".bashrc")
 
         # PATH export line to add
-        path_export = f'\n# themeswitcher PATH\nexport PATH="{self.bin_dir}:$PATH"\n'
+        path_export = f'\n# stasher PATH\nexport PATH="{self.bin_dir}:$PATH"\n'
 
         # Check if already in rc file
         if rc_file.exists():
@@ -122,7 +122,7 @@ class ThemeSwitcherInstaller:
     def create_symlink_alternative(self) -> bool:
         """Alternative method: create symlink in /usr/local/bin"""
         local_bin = Path("/usr/local/bin")
-        symlink_path = local_bin / "themeswitcher"
+        symlink_path = local_bin / "stasher"
 
         if not local_bin.exists():
             print(f"{local_bin} does not exist")
@@ -148,13 +148,13 @@ class ThemeSwitcherInstaller:
     def run(self) -> int:
         """Run the installation process"""
         print("=" * 60)
-        print("  ThemeSwitcher Installer")
+        print("  Stasher Installer")
         print(f"{'=' * 60}\n")
 
         is_linux = self.check_platform()
 
         if not self.create_venv():
-            print("\n❌ Installation failed at virtual environment step\n")
+            print("\nInstallation failed at virtual environment step\n")
             return 1
 
         if not self.install_requirements():
@@ -172,7 +172,7 @@ class ThemeSwitcherInstaller:
             if self.setup_global_path():
                 print("\nAlternative: You can also create a system-wide symlink:")
                 print(
-                    f"   sudo ln -sf {self.shell_script} /usr/local/bin/themeswitcher\n"
+                    f"   sudo ln -sf {self.shell_script} /usr/local/bin/stasher\n"
                 )
 
         print("=" * 60)
@@ -182,14 +182,14 @@ class ThemeSwitcherInstaller:
         if is_linux:
             print("\nNext steps:")
             print("   1. Restart your terminal or run: source ~/.bashrc (or ~/.zshrc)")
-            print("   2. Run: themeswitcher")
+            print("   2. Run: stasher")
 
         return 0
 
 
 def main() -> None:
-    """The main entry point for the ThemeSwitcher installer."""
-    installer = ThemeSwitcherInstaller()
+    """The main entry point for the Stasher installer."""
+    installer = StasherInstaller()
     sys.exit(installer.run())
 
 

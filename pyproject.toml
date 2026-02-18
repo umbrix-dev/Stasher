@@ -1,7 +1,7 @@
 [project]
-name = "themeswitcher"
+name = "stasher"
 version = "1.0.0"
-description = "A config and theme manager for Hyprland"
+description = "A simple snapshot manager for Linux."
 requires-python = ">=3.14"
 
 dependencies = ["platformdirs>=4.5.1"]

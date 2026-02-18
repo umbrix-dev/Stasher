@@ -1,6 +1,6 @@
 # Stasher
 
-Stasher - Apply snapshots of your files and directorys at any time
+Stasher - A Simple snapshot manager for Linux.
 
 ## Installation
 
