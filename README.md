@@ -43,7 +43,7 @@ stasher stash -l  # list all stashes
 Apply any saved stash:
 
 ```bash
-stasher stash -a nord
+stasher stash -a home
 stasher stash -r  # reload known configs (waybar, hyprland, etc...)
 ```
 
