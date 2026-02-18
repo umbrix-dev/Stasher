@@ -31,12 +31,12 @@ class Cli:
                 "_": [self.pathParser.print_usage, ()],
             },
             "theme": {
-                "create": [self.stashService.create_theme, ("create",)],
-                "delete": [self.stashService.delete_theme, ("delete",)],
-                "wipe": [self.stashService.wipe_themes, ()],
-                "list": [self.stashService.list_themes, ()],
-                "apply": [self.stashService.apply_theme, ("apply",)],
-                "reload": [self.stashService.reload_themes, ()],
+                "create": [self.stashService.create_stash, ("create",)],
+                "delete": [self.stashService.delete_stash, ("delete",)],
+                "wipe": [self.stashService.wipe_stashes, ()],
+                "list": [self.stashService.list_stashes, ()],
+                "apply": [self.stashService.apply_stash, ("apply",)],
+                "reload": [self.stashService.reload_stashes, ()],
                 "_": [self.stashParser.print_usage, ()],
             },
         }
