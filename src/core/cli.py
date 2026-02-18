@@ -1,5 +1,6 @@
 import argparse
-from typing import Any, Callable
+from typing import Callable
+
 
 from parsers.path_parser import PathParser
 from parsers.stash_parser import StashParser
