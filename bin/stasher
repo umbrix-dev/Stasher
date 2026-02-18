@@ -3,7 +3,7 @@
 # Define paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-ENTRY_POINT="$PROJECT_ROOT/src/themeswitcher.py"
+ENTRY_POINT="$PROJECT_ROOT/src/stasher.py"
 
 # Check if entry point exists
 if [ ! -f "$ENTRY_POINT" ]; then
