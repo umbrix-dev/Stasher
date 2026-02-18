@@ -116,4 +116,7 @@ class ThemeService:
     def reload_themes(self) -> None:
         commands = [["hyprctl", "reload"], ["killall", "-SIGUSR2", "waybar"]]
         for cmd in commands:
-            subprocess.run(cmd, check=False)
+            try:
+                subprocess.run(cmd, check=False)
+            except Exception:
+                pass
