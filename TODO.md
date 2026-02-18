@@ -4,4 +4,5 @@
 - [ ] Use symlinks
 - [ ] Add backup service
 - [ ] Expose API
-- [X] Rebrand everything to stasher
+- [ ] Avoid stash overriding and create update method
+- [x] Rebrand everything to stasher
