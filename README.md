@@ -1,12 +1,12 @@
-# ThemeSwitcher
+# Stasher
 
-A unique config manager for Hyprland that tracks your dotfiles and lets you swap between themes instantly.
+Stasher - Apply snapshots of your files and directorys at any time
 
 ## Installation
 
 ```bash
-git clone https://github.com/yourusername/themeswitcher.git
-cd themeswitcher
+git clone https://github.com/umbrix-dev/stasher.git
+cd stasher
 python3 install.py
 ```
 
@@ -20,31 +20,31 @@ source ~/.bashrc  # or ~/.zshrc
 
 ### Managing Paths
 
-Tell ThemeSwitcher which config files to track:
+Tell stasher which files or directories to track:
 
 ```bash
-themeswitcher path -a ~/.config/hypr/hyprland.conf
-themeswitcher path -a ~/.config/waybar/config
-themeswitcher path -l  # list all tracked paths
+stasher path -a ~/.config/hypr/hyprland.conf
+stasher path -a ~/.config/waybar/config
+stasher path -l  # list all tracked paths
 ```
 
-### Creating Themes
+### Creating Stashes
 
-Create a snapshot of your current configs:
+Create a snapshot of your tracked files or directories:
 
 ```bash
-themeswitcher theme -c nord
-themeswitcher theme -c catppuccin
-themeswitcher theme -l  # list all themes
+stasher stash -c home
+stasher stash -c work
+stasher stash -l  # list all stashes
 ```
 
-### Switching Themes
+### Switching Stashes
 
-Apply any saved theme:
+Apply any saved stash:
 
 ```bash
-themeswitcher theme -a nord
-themeswitcher theme -r  # reload configs (waybar, hyprland, etc)
+stasher stash -a nord
+stasher stash -r  # reload known configs (waybar, hyprland, etc...)
 ```
 
 ## Commands
@@ -60,26 +60,25 @@ themeswitcher theme -r  # reload configs (waybar, hyprland, etc)
 --wipe               Clear all paths
 ```
 
-### Theme Management
+### Stash Management
 ```
--c, --create name    Save current configs as a theme
--d, --delete name    Delete a theme
--a, --apply name     Switch to a theme
--l, --list           Show all themes
--r, --reload         Reload Hyprland/Waybar/etc
---wipe               Delete all themes
+-c, --create name    Save tracked items as a stash
+-d, --delete name    Delete a stash
+-a, --apply name     Switch to a stash
+-l, --list           Show all stashes
+-r, --reload         Reload known configs (waybar, hyprland, etc...)
+--wipe               Delete all stashes
 ```
 
 </details>
 
 ## How it works
 
-ThemeSwitcher tracks your dotfiles and creates snapshots. When you apply a theme, it swaps out your config files and optionally reloads your environment. Simple as that.
+Stasher lets you track items and create snapshots of them. When you apply a stash, it swaps out your current files and directorys and optionally reloads your environment. Simple as that.
 
 ## Requirements
 
 - Python 3.14.2+
-- Hyprland (optional, for reload functionality)
 
 ## License
 
