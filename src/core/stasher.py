@@ -26,7 +26,7 @@ class Stasher:
         self.stashService = StashService(self.pathService)
         self.cli = Cli(self.pathService, self.stashService)
 
-    def _setup(self) -> None:
+    def setup(self) -> None:
         """Create required directorys and files."""
         safemake(
             {
@@ -41,7 +41,7 @@ class Stasher:
 
     def run(self) -> None:
         """Setup and execute Stasher."""
-        self._setup()
+        self.setup()
         self.cli.execute()
 
 
