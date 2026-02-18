@@ -67,3 +67,4 @@ class Cli:
 
             callback(*callback_args)
             return
+

@@ -100,3 +100,11 @@ class PathService:
         """Clean and remove all paths."""
         with open(self.paths_data, "w"):
             pass
+
+    def get_paths(self) -> list[str] | None:
+        """Get all path entrys."""
+        with open(self.paths_data, "r") as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return None
