@@ -1,11 +1,12 @@
 import argparse
+from typing import Any, Callable
 
 from parsers.path_parser import PathParser
 from parsers.theme_parser import ThemeParser
 
 
 class Cli:
-    def __init__(self, pathService, themeService):
+    def __init__(self, pathService, themeService) -> None:
         """Create parsers and arguments."""
         self.parser = argparse.ArgumentParser(
             description="A unique config manager for hyprland."
@@ -15,33 +16,53 @@ class Cli:
         self.themeParser = ThemeParser(self.subparsers)
         self.pathService = pathService
         self.themeService = themeService
+        self.command_map = self._setup_command_map()
+
+    def _setup_command_map(
+        self,
+    ) -> dict[str, dict[str, list[Callable, tuple[str, ...]]]]:
+        return {
+            "path": {
+                "add": [self.pathService.create_path, ("add",)],
+                "remove": [self.pathService.remove_path, ("remove",)],
+                "wipe": [self.pathService.wipe_paths, ()],
+                "list": [self.pathService.list_paths, ()],
+                "_": [self.pathParser.print_usage, ()],
+            },
+            "theme": {
+                "create": [self.themeService.create_theme, ("create",)],
+                "delete": [self.themeService.delete_theme, ("delete",)],
+                "wipe": [self.themeService.wipe_themes, ()],
+                "list": [self.themeService.list_themes, ()],
+                "apply": [self.themeService.apply_theme, ("apply",)],
+                "reload": [self.themeService.reload_themes, ()],
+                "_": [self.themeParser.print_usage, ()],
+            },
+        }
 
     def execute(self) -> None:
         """Execute the cli."""
         args = self.parser.parse_args()
-        if args.command == "path":
-            if args.add:
-                self.pathService.create_path(args.add)
-            elif args.remove:
-                self.pathService.remove_path(args.remove)
-            elif args.wipe:
-                self.pathService.wipe_paths()
-            elif args.list:
-                self.pathService.list_paths()
-            else:
-                self.pathParser.print_usage()
-        elif args.command == "theme":
-            if args.create:
-                self.themeService.create_theme(args.create)
-            elif args.delete:
-                self.themeService.delete_theme(args.delete)
-            elif args.wipe:
-                self.themeService.wipe_themes()
-            elif args.list:
-                self.themeService.list_themes()
-            elif args.apply:
-                self.themeService.apply_theme(args.apply)
-            elif args.reload:
-                self.themeService.reload_themes()
-            else:
-                self.themeParser.print_usage()
+        group = self.command_map.get(args.command)
+        if not group:
+            return
+
+        for command in group:
+            try:
+                if not getattr(args, command):
+                    continue
+            except AttributeError:
+                callback = group[command][0]
+                callback()
+                return
+
+            callback = group[command][0]
+            callback_args = []
+            for callback_arg in group[command][1]:
+                try:
+                    callback_args.append(getattr(args, callback_arg))
+                except AttributeError:
+                    pass
+
+            callback(*callback_args)
+            return

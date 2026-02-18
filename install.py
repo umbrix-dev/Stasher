@@ -16,7 +16,7 @@ class ThemeSwitcherInstaller:
     def __init__(self) -> None:
         self.root_dir = Path(__file__).parent.resolve()
         self.bin_dir = self.root_dir / "bin"
-        self.venv_dir = self.root_dir / "venv"
+        self.venv_dir = self.root_dir / ".venv"
         self.requirements_file = self.root_dir / "requirements.txt"
         self.shell_script = self.bin_dir / "themeswitcher"
 
