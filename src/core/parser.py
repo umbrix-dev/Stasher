@@ -17,7 +17,9 @@ class Parser:
             "delete": self._create_parser("delete", "Delete a stash.", "name"),
             "list": self._create_parser("list", "List all created stashes."),
             "activate": self._create_parser("activate", "Activate a stash.", "name"),
-            "clear": self._create_parser("clear", "Go out of the current active stash."),
+            "clear": self._create_parser(
+                "clear", "Go out of the current active stash."
+            ),
             "track": self._create_parser("track", "Track a path.", "path"),
             "untrack": self._create_parser("untrack", "Untrack a path.", "path"),
             "tracked": self._create_parser(

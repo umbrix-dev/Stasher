@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 import shutil
 from pathlib import Path
 
@@ -12,13 +13,12 @@ from rich import print as rprint
 from core.errors import (
     DirectoryNameError,
     StashNotFoundError,
-    NoEntrysError,
     StashExistsError,
 )
 
 
-class StashService:
-    """The main service for stashing."""
+class Service:
+    """The main service for Stasher."""
 
     def __init__(self):
         self.user_data_dir = Path(platformdirs.user_data_dir())
@@ -42,6 +42,12 @@ class StashService:
 
         raise DirectoryNameError("name cannot only consist of dots.")
 
+    def _validate_path(self, path: str) -> None:
+        """Validate a path entry."""
+        path_object = Path(path)
+        if not path_object.exists():
+            raise FileNotFoundError(f"path: '{path}' was not found.")
+
     def _get_stash(self, name: str) -> Path:
         """Check if a stash exists and return it."""
         path = self.stashes_dir / name
@@ -49,6 +55,24 @@ class StashService:
             raise StashNotFoundError(f"stash with name: '{name}' was not found.")
         else:
             return path
+
+    def _get_stash_data(self, name: str) -> dict:
+        """Get the data of a stash."""
+        path = self._get_stash(name)
+        data = path / ".stash.json"
+        if data.exists():
+            with open(data, "r") as f:
+                return json.load(f)
+        else:
+            raise FileNotFoundError(
+                f"'.stash.json' could not be found in path: '{path}'."
+            )
+
+    def _write_stash_data(self, name: str, data: dict):
+        """Write to the data of a stash."""
+        path = self._get_stash(name)
+        with open(path / ".stash.json", "w") as f:
+            json.dump(data, f, indent=4)
 
     def _get_stash_code(self, name: str) -> int:
         """Check if a stash exists and return an exit code."""
@@ -58,22 +82,36 @@ class StashService:
         else:
             return 0
 
-    def _get_active(self) -> str:
-        """Get the current active stash."""
+    def _get_active_name(self) -> str | None:
+        """Get the current active stash if it exists."""
         with open(self.active_file, "r") as f:
             name = f.read().strip()
             if self._get_stash_code(name) == 0:
                 return name
+
+    def _get_active_path(self) -> Path | None:
+        """Get the current active stash path if it exists."""
+        name = self._get_active_name()
+        if not name:
+            return
+
+        path = self.stashes_dir / name
+        if path.exists():
+            return path
 
     def create(self, name: str) -> None:
         """Create a new stash."""
         self._validate_name(name)
 
         path = self.stashes_dir / name
+        data = path / ".stash.json"
+
         if os.path.exists(path):
             raise StashExistsError(f"stash with name: '{name}' already exists.")
         else:
             path.mkdir()
+            with open(data, "w") as f:
+                json.dump({"tracked": []}, f, indent=4)
 
     def delete(self, name: str) -> None:
         """Delete a stash."""
@@ -82,7 +120,7 @@ class StashService:
         try:
             shutil.rmtree(path)
 
-            active_name = self._get_active()
+            active_name = self._get_active_name()
             if active_name == name:
                 self.clear()
         except Exception as e:
@@ -111,13 +149,12 @@ class StashService:
 
     def status(self) -> None:
         """Print the current active stash."""
-        with open(self.active_file, "r") as f:
-            name = f.read().strip()
-            if self._get_stash_code(name) == 1:
-                print("No current active stash.")
-                print("Activate one by doing: stasher activate <name>")
-            else:
-                print(name)
+        active_name = self._get_active_name()
+        if not active_name:
+            print("No current active stash.")
+            print("Activate one by doing: stasher activate <name>")
+        else:
+            print(active_name)
 
     def tree(self, name: str) -> None:
         """Print the tree of a stash."""
@@ -135,3 +172,17 @@ class StashService:
         treeObj = Tree(path.name)
         _build(path, treeObj)
         rprint(treeObj)
+
+    def track(self, path: str) -> None:
+        active_name = self._get_active_name()
+        if not active_name:
+            print("No current active stash. Cant track.")
+            print("Activate one by doing: stasher activate <name>")
+            return
+
+        self._validate_path(path)
+
+        data = self._get_stash_data(active_name)
+        data["tracked"].append(path)
+
+        self._write_stash_data(active_name, data)
