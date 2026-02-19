@@ -190,6 +190,23 @@ class Service:
             data["tracked"].append(path)
             self._write_stash_data(active_name, data)
 
+    def untrack(self, path: str) -> None:
+        """Untrack a path of the current active stash."""
+        active_name = self._get_active_name()
+        if not active_name:
+            print("No current active stash")
+            print("Activate one by doing: stasher activate <name>")
+            return
+
+        self._validate_path(path)
+
+        data = self._get_stash_data(active_name)
+        if not path in data["tracked"]:
+            print("path is not tracked.")
+        else:
+            data["tracked"].remove(path)
+            self._write_stash_data(active_name, data)
+
     def tracked(self) -> None:
         """List all tracked paths of the current active stash."""
         active_name = self._get_active_name()

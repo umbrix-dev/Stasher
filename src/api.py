@@ -11,4 +11,3 @@ _stasher = Stasher()
 def setup() -> None:
     """Setup Stasher."""
     _stasher.setup()
-
