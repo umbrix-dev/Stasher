@@ -111,7 +111,7 @@ class Service:
         else:
             path.mkdir()
             with open(data, "w") as f:
-                json.dump({"tracked": []}, f, indent=4)
+                json.dump({"tracked": {}}, f, indent=4)
 
     def delete(self, name: str) -> None:
         """Delete a stash."""
@@ -184,13 +184,13 @@ class Service:
         self._validate_path(path)
 
         data = self._get_stash_data(active_name)
-        if path in data["tracked"]:
+        if path in data["tracked"].values():
             print("path already tracked.")
         else:
-            data["tracked"].append(path)
+            data["tracked"][Path(path).name] = path
             self._write_stash_data(active_name, data)
 
-    def untrack(self, path: str) -> None:
+    def untrack(self, path_or_key: str) -> None:
         """Untrack a path of the current active stash."""
         active_name = self._get_active_name()
         if not active_name:
@@ -198,13 +198,27 @@ class Service:
             print("Activate one by doing: stasher activate <name>")
             return
 
-        self._validate_path(path)
-
         data = self._get_stash_data(active_name)
-        if not path in data["tracked"]:
+        for filename, tracked_path in data["tracked"].items():
+            if path_or_key == filename:
+                key = filename
+                path = data["tracked"][path_or_key]
+                break
+            elif path_or_key == tracked_path:
+                key = filename
+                path = tracked_path
+                break
+            else:
+                key = None
+                path = None
+
+        if not path or not key:
+            raise FileNotFoundError(f"path: '{path}' was not found.")
+
+        if not path in data["tracked"].values():
             print("path is not tracked.")
         else:
-            data["tracked"].remove(path)
+            data["tracked"].pop(key, None)
             self._write_stash_data(active_name, data)
 
     def tracked(self) -> None:
@@ -216,5 +230,5 @@ class Service:
             return
 
         data = self._get_stash_data(active_name)
-        for path in data["tracked"]:
-            print(path)
+        for filename, path in data["tracked"].items():
+            print(filename, path)

@@ -24,7 +24,7 @@ class Cli:
             "status": [self.service.status],
             "tree": [self.service.tree, "name"],
             "track": [self.service.track, "path"],
-            "untrack": [self.service.untrack, "path"],
+            "untrack": [self.service.untrack, "path_or_key"],
             "tracked": [self.service.tracked],
         }
 

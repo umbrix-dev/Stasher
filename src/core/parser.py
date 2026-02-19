@@ -21,7 +21,7 @@ class Parser:
                 "clear", "Go out of the current active stash."
             ),
             "track": self._create_parser("track", "Track a path.", "path"),
-            "untrack": self._create_parser("untrack", "Untrack a path.", "path"),
+            "untrack": self._create_parser("untrack", "Untrack a path.", "path_or_key"),
             "tracked": self._create_parser(
                 "tracked", "List all tracked paths in the current active stash."
             ),
