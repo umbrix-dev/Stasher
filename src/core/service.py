@@ -167,7 +167,7 @@ class Service:
         if not active_name:
             no_active_stash()
             return
-        
+
         data = self._get_stash_data(active_name)
         for path in data["tracked"].values():
             dest = active_path / Path(path).name
