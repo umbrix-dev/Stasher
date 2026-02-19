@@ -19,6 +19,7 @@ class Cli:
             "delete": [self.stash_service.delete, "name"],
             "list": [self.stash_service.list],
             "activate": [self.stash_service.activate, "name"],
+            "clear": [self.stash_service.clear],
             "status": [self.stash_service.status],
             "tree": [self.stash_service.tree, "name"],
         }

@@ -50,6 +50,21 @@ class StashService:
         else:
             return path
 
+    def _get_stash_code(self, name: str) -> int:
+        """Check if a stash exists and return an exit code."""
+        path = self.stashes_dir / name
+        if not path.exists() or path.parent.name != "stashes":
+            return 1
+        else:
+            return 0
+
+    def _get_active(self) -> str:
+        """Get the current active stash."""
+        with open(self.active_file, "r") as f:
+            name = f.read().strip()
+            if self._get_stash_code(name) == 0:
+                return name
+
     def create(self, name: str) -> None:
         """Create a new stash."""
         self._validate_name(name)
@@ -66,6 +81,10 @@ class StashService:
 
         try:
             shutil.rmtree(path)
+
+            active_name = self._get_active()
+            if active_name == name:
+                self.clear()
         except Exception as e:
             print(f"Could not remove directory '{path}': {e}", file=sys.stderr)
             sys.exit(1)
@@ -85,11 +104,16 @@ class StashService:
         with open(self.active_file, "w") as f:
             f.write(name)
 
+    def clear(self) -> None:
+        """Go out of the current active stash."""
+        with open(self.active_file, "w"):
+            pass
+
     def status(self) -> None:
         """Print the current active stash."""
         with open(self.active_file, "r") as f:
             name = f.read().strip()
-            if not self._get_stash(name):
+            if self._get_stash_code(name) == 1:
                 print("No current active stash.")
                 print("Activate one by doing: stasher activate <name>")
             else:
@@ -99,6 +123,7 @@ class StashService:
         """Print the tree of a stash."""
 
         def _build(path: Path, tree: Tree) -> None:
+            """Recursively build the tree of a path."""
             for child in sorted(path.iterdir()):
                 if child.is_dir():
                     branch = tree.add(f"{child.name}/")
