@@ -20,6 +20,7 @@ class Cli:
             "delete": [self.stash_service.delete, "name"],
             "list": [self.stash_service.list],
             "activate": [self.stash_service.activate, "name"],
+            "status": [self.stash_service.status],
         }
 
     def execute(self) -> None:

@@ -83,3 +83,13 @@ class StashService:
 
         with open(self.active_file, "w") as f:
             f.write(name)
+
+    def status(self) -> None:
+        """Print the current active stash."""
+        with open(self.active_file, "r") as f:
+            name = f.read().strip()
+            if not self._get_stash(name):
+                print("No current active stash.")
+                print("Activate one by doing: stasher activate <name>")
+            else:
+                print(name)
