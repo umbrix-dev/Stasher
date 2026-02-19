@@ -23,7 +23,7 @@ class StashService:
         self.user_data_dir = Path(platformdirs.user_data_dir())
         self.root_dir = self.user_data_dir / "stasher"
         self.stashes_dir = self.root_dir / "stashes"
-        
+
     def _validate_name(self, name: str) -> None:
         """Validate a name to be used for a stash."""
         name = name.strip()
@@ -39,16 +39,31 @@ class StashService:
                 return
 
         raise DirectoryNameError("name cannot only consist of dots.")
-        
+
+    def _get_stash(self, name: str) -> Path:
+        """Check if a stash exists and return it."""
+        path = self.stashes_dir / name
+        if not path.exists():
+            raise StashNotFoundError(f"stash with name: '{name}' was not found.")
+        else:
+            return path
+
     def create(self, name: str) -> None:
         """Create a new stash."""
         self._validate_name(name)
-        
+
         path = self.stashes_dir / name
         if os.path.exists(path):
             raise StashExistsError(f"stash with name: '{name}' already exists.")
         else:
             path.mkdir()
-            
 
-    
+    def delete(self, name: str) -> None:
+        """Delete a stash."""
+        path = self._get_stash(name)
+
+        try:
+            shutil.rmtree(path)
+        except Exception as e:
+            print(f"Could not remove directory '{path}': {e}", file=sys.stderr)
+            sys.exit(1)

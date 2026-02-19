@@ -16,7 +16,8 @@ class Cli:
         self,
     ) -> dict[str, dict[str, list[Callable, tuple[str, ...]]]]:
         return {
-            "create": [self.stash_service.create, "name"]
+            "create": [self.stash_service.create, "name"],
+            "delete": [self.stash_service.delete, "name"]
         }
 
     def execute(self) -> None:
