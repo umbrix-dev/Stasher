@@ -1,0 +1,2 @@
+platformdirs>=4.9.2
+rich>=14.3.2
