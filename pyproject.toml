@@ -4,7 +4,7 @@ version = "1.0.0"
 description = "A simple snapshot manager for Linux."
 requires-python = ">=3.14"
 
-dependencies = ["platformdirs>=4.5.1"]
+dependencies = ["platformdirs>=4.5.1", "rich>=14.3.2"]
 
 [build-system]
 requires = ["setuptools>=68"]
