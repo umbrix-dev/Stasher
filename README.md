@@ -78,7 +78,7 @@ Stasher lets you track items and create snapshots of them. When you apply a stas
 
 ## Requirements
 
-- Python 3.14.2+
+- Python 3.14+
 
 ## License
 
