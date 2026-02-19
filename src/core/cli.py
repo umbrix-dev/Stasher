@@ -22,6 +22,7 @@ class Cli:
             "activate": [self.service.activate, "name"],
             "clear": [self.service.clear],
             "status": [self.service.status],
+            "push": [self.service.push],
             "tree": [self.service.tree, "name"],
             "track": [self.service.track, "path"],
             "untrack": [self.service.untrack, "path_or_key"],

@@ -17,6 +17,11 @@ from core.errors import (
 )
 
 
+def no_active_stash() -> None:
+    print("No current active stash.")
+    print("Activate one by doing: stasher activate <name>")
+
+
 class Service:
     """The main service for Stasher."""
 
@@ -151,10 +156,25 @@ class Service:
         """Print the current active stash."""
         active_name = self._get_active_name()
         if not active_name:
-            print("No current active stash.")
-            print("Activate one by doing: stasher activate <name>")
+            no_active_stash()
         else:
             print(active_name)
+
+    def push(self) -> None:
+        """Push changes to the current active stash."""
+        active_path = self._get_active_path()
+        active_name = self._get_active_name()
+        if not active_name:
+            no_active_stash()
+            return
+        
+        data = self._get_stash_data(active_name)
+        for path in data["tracked"].values():
+            dest = active_path / Path(path).name
+            if os.path.isfile(path):
+                shutil.copy2(path, dest)
+            else:
+                shutil.copytree(path, dest)
 
     def tree(self, name: str) -> None:
         """Print the tree of a stash."""
@@ -177,8 +197,7 @@ class Service:
         """Track a path to the current active stash."""
         active_name = self._get_active_name()
         if not active_name:
-            print("No current active stash. Cant track.")
-            print("Activate one by doing: stasher activate <name>")
+            no_active_stash()
             return
 
         self._validate_path(path)
@@ -194,8 +213,7 @@ class Service:
         """Untrack a path of the current active stash."""
         active_name = self._get_active_name()
         if not active_name:
-            print("No current active stash")
-            print("Activate one by doing: stasher activate <name>")
+            no_active_stash()
             return
 
         data = self._get_stash_data(active_name)
@@ -225,8 +243,7 @@ class Service:
         """List all tracked paths of the current active stash."""
         active_name = self._get_active_name()
         if not active_name:
-            print("No current active stash. Cant show tracked paths.")
-            print("Activate one by doing: stasher activate <name>")
+            no_active_stash()
             return
 
         data = self._get_stash_data(active_name)
