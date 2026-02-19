@@ -25,17 +25,7 @@ class Parser:
             "tracked": self._create_parser(
                 "tracked", "List all tracked paths in the current active stash."
             ),
-            "auth": self._create_parser(
-                "auth", "Create a safety layer to securely handle dangerous actions."
-            ),
-            "wipe": self._create_parser("wipe", "Wipe all stashes."),
             "status": self._create_parser("status", "Show current active stash."),
-            "update": self._create_parser(
-                "update", "Update current active stash with changed files."
-            ),
-            "merge": self._create_parser(
-                "merge", "Merge 2 stashes together.", "name_1", "name_2"
-            ),
             "tree": self._create_parser("tree", "Print the tree of a stash.", "name"),
         }
 
