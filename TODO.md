@@ -1,6 +1,6 @@
 # Todo
 
-- [ ] Add support for files
+- [X] Add support for files
 - [ ] Use symlinks
 - [ ] Add backup service
 - [ ] Expose API
