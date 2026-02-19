@@ -24,6 +24,7 @@ class Cli:
             "status": [self.service.status],
             "tree": [self.service.tree, "name"],
             "track": [self.service.track, "path"],
+            "tracked": [self.service.tracked],
         }
 
     def execute(self) -> None:

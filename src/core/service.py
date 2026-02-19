@@ -174,6 +174,7 @@ class Service:
         rprint(treeObj)
 
     def track(self, path: str) -> None:
+        """Track a path to the current active stash."""
         active_name = self._get_active_name()
         if not active_name:
             print("No current active stash. Cant track.")
@@ -183,6 +184,20 @@ class Service:
         self._validate_path(path)
 
         data = self._get_stash_data(active_name)
-        data["tracked"].append(path)
+        if path in data["tracked"]:
+            print("path already tracked.")
+        else:
+            data["tracked"].append(path)
+            self._write_stash_data(active_name, data)
 
-        self._write_stash_data(active_name, data)
+    def tracked(self) -> None:
+        """List all tracked paths of the current active stash."""
+        active_name = self._get_active_name()
+        if not active_name:
+            print("No current active stash. Cant show tracked paths.")
+            print("Activate one by doing: stasher activate <name>")
+            return
+
+        data = self._get_stash_data(active_name)
+        for path in data["tracked"]:
+            print(path)
