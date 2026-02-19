@@ -33,6 +33,7 @@ class Parser:
             "merge": self._create_parser(
                 "merge", "Merge 2 stashes together.", "name_1", "name_2"
             ),
+            "tree": self._create_parser("tree", "Print the tree of a stash.", "name"),
         }
 
     def _create_parser(

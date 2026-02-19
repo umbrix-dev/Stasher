@@ -5,6 +5,8 @@ from pathlib import Path
 
 
 import platformdirs
+from rich.tree import Tree
+from rich import print as rprint
 
 
 from core.errors import (
@@ -43,7 +45,7 @@ class StashService:
     def _get_stash(self, name: str) -> Path:
         """Check if a stash exists and return it."""
         path = self.stashes_dir / name
-        if not path.exists():
+        if not path.exists() or path.parent.name != "stashes":
             raise StashNotFoundError(f"stash with name: '{name}' was not found.")
         else:
             return path
@@ -92,3 +94,19 @@ class StashService:
                 print("Activate one by doing: stasher activate <name>")
             else:
                 print(name)
+
+    def tree(self, name: str) -> None:
+        """Print the tree of a stash."""
+
+        def _build(path: Path, tree: Tree) -> None:
+            for child in sorted(path.iterdir()):
+                if child.is_dir():
+                    branch = tree.add(f"{child.name}/")
+                    _build(child, branch)
+                else:
+                    tree.add(child.name)
+
+        path = self._get_stash(name)
+        treeObj = Tree(path.name)
+        _build(path, treeObj)
+        rprint(treeObj)
