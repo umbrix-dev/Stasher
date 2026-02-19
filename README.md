@@ -1,6 +1,6 @@
 # Stasher
 
-Stasher - A Simple snapshot manager for Linux.
+Stasher - A simple snapshot manager for Linux.
 
 ## Installation
 
