@@ -67,3 +67,10 @@ class StashService:
         except Exception as e:
             print(f"Could not remove directory '{path}': {e}", file=sys.stderr)
             sys.exit(1)
+
+    def list(self) -> None:
+        """List all created stashes."""
+        for stash in os.listdir(self.stashes_dir):
+            path = os.path.join(self.stashes_dir, stash)
+            if os.path.isdir(path):
+                print(stash)
