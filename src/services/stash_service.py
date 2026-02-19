@@ -22,6 +22,7 @@ class StashService:
     def __init__(self):
         self.user_data_dir = Path(platformdirs.user_data_dir())
         self.root_dir = self.user_data_dir / "stasher"
+        self.active_file = self.root_dir / "active.txt"
         self.stashes_dir = self.root_dir / "stashes"
 
     def _validate_name(self, name: str) -> None:
@@ -74,3 +75,11 @@ class StashService:
             path = os.path.join(self.stashes_dir, stash)
             if os.path.isdir(path):
                 print(stash)
+
+    def activate(self, name: str) -> None:
+        """Activate a stash."""
+        if not self._get_stash(name):
+            return
+
+        with open(self.active_file, "w") as f:
+            f.write(name)

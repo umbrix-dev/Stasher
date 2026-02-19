@@ -17,13 +17,19 @@ class Stasher:
         self.user_data_dir = Path(platformdirs.user_data_dir())
         self.root_dir = self.user_data_dir / "stasher"
         self.stashes_dir = self.root_dir / "stashes"
+        self.active_file = self.root_dir / "active.txt"
         self.stashService = StashService()
         self.cli = Cli(self.stashService)
 
     def setup(self) -> None:
         """Create required directorys and files."""
         safemake(
-            {self.user_data_dir: False, self.root_dir: False, self.stashes_dir: False}
+            {
+                self.user_data_dir: False,
+                self.root_dir: False,
+                self.stashes_dir: False,
+                self.active_file: True,
+            }
         )
 
     def run(self) -> None:

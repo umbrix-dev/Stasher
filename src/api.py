@@ -3,7 +3,7 @@ api.py - Exposes a clean and stable API for frontends
 """
 
 from core.stasher import Stasher
-from services.PathService import PathService
+from services.PathServiceOld import PathService
 
 
 _stasher = Stasher()
