@@ -5,7 +5,7 @@
 - [ ] Add backup service
 - [ ] Expose API
 - [X] Avoid stash overriding 
-- [ ] Create update method
+- [ ] Create push method
 - [X] Fix duplicates when trying to track path which is already tracked
 - [ ] Refactor to more git-style version
 - [x] Rebrand everything to stasher
