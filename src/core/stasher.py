@@ -4,8 +4,7 @@ from pathlib import Path
 import platformdirs
 
 
-from services.PathService import PathService
-from services.StashService import StashService
+from core.service import Service
 from core.cli import Cli
 from core.utils import safemake
 
@@ -17,14 +16,10 @@ class Stasher:
         """Define paths."""
         self.user_data_dir = Path(platformdirs.user_data_dir())
         self.root_dir = self.user_data_dir / "stasher"
-        self.stashes_dir = self.root_dir / "themes"
-        self.backups_dir = self.root_dir / "backups"
-        self.auto_backups_dir = self.backups_dir / "auto"
-        self.paths_data = self.root_dir / "paths.json"
-
-        self.pathService = PathService()
-        self.stashService = StashService(self.pathService)
-        self.cli = Cli(self.pathService, self.stashService)
+        self.stashes_dir = self.root_dir / "stashes"
+        self.active_file = self.root_dir / "active.txt"
+        self.service = Service()
+        self.cli = Cli(self.service)
 
     def setup(self) -> None:
         """Create required directorys and files."""
@@ -33,9 +28,7 @@ class Stasher:
                 self.user_data_dir: False,
                 self.root_dir: False,
                 self.stashes_dir: False,
-                self.backups_dir: False,
-                self.auto_backups_dir: False,
-                self.paths_data: True,
+                self.active_file: True,
             }
         )
 
