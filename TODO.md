@@ -4,7 +4,8 @@
 - [ ] Use symlinks
 - [ ] Add backup service
 - [ ] Expose API
-- [ ] Avoid stash overriding and create update method
+- [X] Avoid stash overriding 
+- [ ] Create update method
 - [X] Fix duplicates when trying to track path which is already tracked
 - [ ] Refactor to more git-style version
 - [x] Rebrand everything to stasher
